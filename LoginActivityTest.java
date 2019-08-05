@@ -325,7 +325,7 @@ public class LoginActivityTest {
     }
 
     @Test
-    public void testSpeakerCallClick() throws InterruptedException {
+    public void testIsSpeakerButtonWorking() throws InterruptedException {
         loginMethod();
         onView(withId(R.id.callee_edit_text)).check(matches(isDisplayed()));
         onView(withId(R.id.callee_edit_text)).perform(typeText(USER_NAME));
@@ -343,7 +343,7 @@ public class LoginActivityTest {
     }
 
     @Test
-    public void testHoldButtonClick() throws InterruptedException {
+    public void testIsHoldButtonWorking() throws InterruptedException {
         loginMethod();
         isLoginSucceed = true;
         onView(withId(R.id.callee_edit_text)).check(matches(isDisplayed()));
@@ -359,6 +359,24 @@ public class LoginActivityTest {
         onView(withId(R.id.hold_button)).check(matches(isDisplayed()));
         onView(withId(R.id.hold_button)).perform(click());
         sleep(5000);
+    }
+
+    @Test
+    public void testVideoCallClick() throws InterruptedException {
+        loginMethod();
+        onView(withId(R.id.login_button)).perform(click());
+        isLoginSucceed = true;
+        onView(withId(R.id.callee_edit_text)).check(matches(isDisplayed()));
+        onView(withId(R.id.callee_edit_text)).perform(typeText(USER_NAME));
+        Espresso.closeSoftKeyboard();
+        onView(withId(R.id.start_call_button)).perform(click());
+        sleep(5000);
+        onView(withId(R.id.localVideoView)).perform(swipeUp());
+        sleep(5000);
+        onView(withId(R.id.video_toggle_button)).check(matches(isDisplayed()));
+        onView(withId(R.id.video_toggle_button)).perform(click());
+        sleep(5000);
+        onView(withId(R.id.call_end_button)).perform(click());
     }
 
     @Test
