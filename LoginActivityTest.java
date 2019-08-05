@@ -362,7 +362,7 @@ public class LoginActivityTest {
     }
 
     @Test
-    public void testVideoCallClick() throws InterruptedException {
+    public void testIsVideoStartStopButtonWorking() throws InterruptedException {
         loginMethod();
         onView(withId(R.id.login_button)).perform(click());
         isLoginSucceed = true;
