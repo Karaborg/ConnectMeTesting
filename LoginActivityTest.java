@@ -1,14 +1,11 @@
 package com.rbbn.connectme;
 
-import android.app.Activity;
 import android.support.test.espresso.Espresso;
 import android.support.test.filters.LargeTest;
 import android.support.test.rule.ActivityTestRule;
 import android.support.test.runner.AndroidJUnit4;
 
-import androidx.test.runner.lifecycle.ActivityLifecycleMonitorRegistry;
-import androidx.test.runner.lifecycle.Stage;
-
+import com.genband.mobile.api.services.call.CallInterface;
 import com.genband.mobile.api.utilities.MobileError;
 import com.rbbn.connectme.modules.registration.RegistrationModuleCallback;
 import com.rbbn.connectme.ui.LoginActivity;
@@ -18,9 +15,6 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-
-import java.util.Collection;
-import java.util.Iterator;
 
 import static android.support.test.InstrumentationRegistry.getContext;
 import static android.support.test.espresso.Espresso.closeSoftKeyboard;
@@ -36,7 +30,6 @@ import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static android.support.test.espresso.matcher.ViewMatchers.withHint;
 import static android.support.test.espresso.matcher.ViewMatchers.withId;
 import static android.support.test.espresso.matcher.ViewMatchers.withText;
-import static androidx.test.platform.app.InstrumentationRegistry.getInstrumentation;
 import static java.lang.Thread.sleep;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
@@ -45,8 +38,10 @@ import static org.hamcrest.Matchers.not;
 @LargeTest
 public class LoginActivityTest {
 
-    private static final String USER_NAME = "adem8@spidr.com";
-    private static final String CALLEE_NAME = "adem7@spidr.com";
+    private CallInterface activeCall;
+
+    private static final String USER_NAME = "adem7@spidr.com";
+    private static final String CALLEE_NAME = "adem8@spidr.com";
     private static final String USER_PASSWORD = "1234";
 
     private static final String USER_NAME_WRONG = "thisIsWrongUserName";
@@ -171,7 +166,7 @@ public class LoginActivityTest {
     }
 
     @Test
-    public void testIsUsernameAcceptSpacesAtTheEnd() {
+    public void testIsUsernameTrimSpacesAtTheEnd() {
         onView(withId(R.id.user_name_edit_text)).perform(typeText(USERNAME_BUT_HAS_SPACES));
         Espresso.closeSoftKeyboard();
         onView(withId(R.id.password_edit_text)).perform(typeText(USER_PASSWORD));
@@ -181,7 +176,7 @@ public class LoginActivityTest {
     }
 
     @Test
-    public void testIsPasswordAcceptSpacesAtTheEnd() {
+    public void testIsPasswordTrimSpacesAtTheEnd() {
         onView(withId(R.id.user_name_edit_text)).perform(typeText(USER_NAME));
         Espresso.closeSoftKeyboard();
         onView(withId(R.id.password_edit_text)).perform(typeText(PASSWORD_BUT_HAS_SPACES));
@@ -219,7 +214,7 @@ public class LoginActivityTest {
     }
 
     @Test
-    public void testIsCalleeTextFieldAcceptWithoutDomain() throws InterruptedException {
+    public void testIsCalleeTextFieldAcceptUsernamesWithoutDomain() throws InterruptedException {
         loginMethod();
         onView(withId(R.id.login_button)).perform(click());
         isLoginSucceed = true;
@@ -232,7 +227,7 @@ public class LoginActivityTest {
     }
 
     @Test
-    public void testIsCalleeTextFieldAcceptSpaces() throws InterruptedException {
+    public void testIsCalleeTextFieldTrimSpaces() throws InterruptedException {
         loginMethod();
         onView(withId(R.id.login_button)).perform(click());
         isLoginSucceed = true;
@@ -245,22 +240,26 @@ public class LoginActivityTest {
     }
 
     @Test
-    public void testIsCallingSucceeded() throws InterruptedException {
+    public void testIsCallingSucceeded() throws InterruptedException {  //
+        //onView(withText(R.string.failed_to_start_call)).inRoot(withDecorView(not(is(mActivity.getActivity().getWindow().getDecorView())))).check(matches(not(isDisplayed())));
+
         loginMethod();
         onView(withId(R.id.login_button)).perform(click());
+        sleep(5000);
         isLoginSucceed = true;
         onView(withId(R.id.callee_edit_text)).perform(typeText(CALLEE_NAME));
-        Espresso.closeSoftKeyboard();
         onView(withId(R.id.start_call_button)).perform(click());
         sleep(5000);
-        onView(withText(R.string.failed_to_start_call)).inRoot(withDecorView(not(is(mActivity.getActivity().getWindow().getDecorView())))).check(matches(not(isDisplayed())));
-        onView(withText(R.id.call_end_button)).perform(click());
+        onView(withId(R.id.call_end_button)).check(matches(isDisplayed()));
+        onView(withId(R.id.call_end_button)).perform(click());
     }
 
     @Test
-    public void testIsUsernameFieldTextAcceptsWithoutDomain(){
+    public void testIsUsernameFieldTextAcceptsUsernamesWithoutDomain() {
         onView(withId(R.id.user_name_edit_text)).perform(typeText(USER_NAME_BUT_HAS_NO_DOMAIN));
+        Espresso.closeSoftKeyboard();
         onView(withId(R.id.password_edit_text)).perform(typeText(USER_PASSWORD));
+        Espresso.closeSoftKeyboard();
         onView(withId(R.id.login_button)).perform(click());
         onView(withText(R.string.failed_to_login)).inRoot(withDecorView(not(is(mActivity.getActivity().getWindow().getDecorView())))).check(matches(isDisplayed()));
     }
@@ -284,7 +283,7 @@ public class LoginActivityTest {
     }
 
     @Test
-    public void testIsCalleeTextFieldAcceptsRandomUserWithValidDomain() throws InterruptedException {
+    public void testIsCalleeTextFieldAcceptsRandomUserWithValidDomain() throws InterruptedException {   //
         loginMethod();
         onView(withId(R.id.login_button)).perform(click());
         sleep(2500);
@@ -296,7 +295,36 @@ public class LoginActivityTest {
         onView(withText(R.string.failed_to_start_call)).inRoot(withDecorView(not(is(mActivity.getActivity().getWindow().getDecorView())))).check(matches(isDisplayed()));
     }
 
+    @Test
+    public void testAcceptingIncomingCallSuccess() throws InterruptedException {
+        loginMethod();
+        onView(withId(R.id.login_button)).perform(click());
+        isLoginSucceed = true;
+        onView(withId(R.id.callee_edit_text)).check(matches(isDisplayed()));
+        onView(withId(R.id.callee_edit_text)).perform(typeText(USER_NAME));
+        Espresso.closeSoftKeyboard();
+        onView(withId(R.id.start_call_button)).perform(click());
+        sleep(5000);
+        onView(withId(R.id.accept_call_button)).check(matches(isDisplayed()));
+        onView(withId(R.id.accept_call_button)).perform(click());
+        sleep(5000);
+        onView(withId(R.id.call_end_button)).perform(click());
+    }
 
+    @Test
+    public void testRejectingIncomingCallSuccess() throws InterruptedException {
+        loginMethod();
+        onView(withId(R.id.login_button)).perform(click());
+        isLoginSucceed = true;
+        onView(withId(R.id.callee_edit_text)).check(matches(isDisplayed()));
+        onView(withId(R.id.callee_edit_text)).perform(typeText(USER_NAME));
+        Espresso.closeSoftKeyboard();
+        onView(withId(R.id.start_call_button)).perform(click());
+        sleep(5000);
+        onView(withId(R.id.reject_call_button)).check(matches(isDisplayed()));
+        onView(withId(R.id.reject_call_button)).perform(click());
+        sleep(5000);
+    }
 
     @Test
     public void isUsernameSameAsUserTextField() {
@@ -338,19 +366,5 @@ public class LoginActivityTest {
             public void onFail(MobileError error) {
             }
         });
-    }
-
-    private Activity getActivityInstance(){
-        final Activity[] currentActivity = {null};
-
-        getInstrumentation().runOnMainSync(new Runnable(){
-            public void run(){
-                Collection<Activity> resumedActivity = ActivityLifecycleMonitorRegistry.getInstance().getActivitiesInStage(Stage.RESUMED);
-                Iterator<Activity> it = resumedActivity.iterator();
-                currentActivity[0] = it.next();
-            }
-        });
-
-        return currentActivity[0];
     }
 }
