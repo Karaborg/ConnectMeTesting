@@ -21,6 +21,7 @@ import static android.support.test.espresso.Espresso.closeSoftKeyboard;
 import static android.support.test.espresso.Espresso.onView;
 import static android.support.test.espresso.action.ViewActions.clearText;
 import static android.support.test.espresso.action.ViewActions.click;
+import static android.support.test.espresso.action.ViewActions.swipeUp;
 import static android.support.test.espresso.action.ViewActions.typeText;
 import static android.support.test.espresso.assertion.PositionAssertions.isAbove;
 import static android.support.test.espresso.assertion.PositionAssertions.isBelow;
@@ -214,7 +215,7 @@ public class LoginActivityTest {
     }
 
     @Test
-    public void testIsCalleeTextFieldAcceptUsernamesWithoutDomain() throws InterruptedException {
+    public void testIsCalleeTextFieldAcceptUsernamesWithoutDomain() throws InterruptedException {       //KÜBRA
         loginMethod();
         onView(withId(R.id.login_button)).perform(click());
         isLoginSucceed = true;
@@ -222,7 +223,7 @@ public class LoginActivityTest {
         onView(withId(R.id.callee_edit_text)).perform(typeText(USER_NAME_BUT_HAS_NO_DOMAIN));
         Espresso.closeSoftKeyboard();
         onView(withId(R.id.start_call_button)).perform(click());
-        sleep(2500);
+        sleep(5000);
         onView(withText(R.string.failed_to_start_call)).inRoot(withDecorView(not(is(mActivity.getActivity().getWindow().getDecorView())))).check(matches(not(isDisplayed())));
     }
 
@@ -240,9 +241,7 @@ public class LoginActivityTest {
     }
 
     @Test
-    public void testIsCallingSucceeded() throws InterruptedException {  //
-        //onView(withText(R.string.failed_to_start_call)).inRoot(withDecorView(not(is(mActivity.getActivity().getWindow().getDecorView())))).check(matches(not(isDisplayed())));
-
+    public void testIsCallingSucceeded() throws InterruptedException {  //  Kübra
         loginMethod();
         onView(withId(R.id.login_button)).perform(click());
         sleep(5000);
@@ -250,7 +249,6 @@ public class LoginActivityTest {
         onView(withId(R.id.callee_edit_text)).perform(typeText(CALLEE_NAME));
         onView(withId(R.id.start_call_button)).perform(click());
         sleep(5000);
-        onView(withId(R.id.call_end_button)).check(matches(isDisplayed()));
         onView(withId(R.id.call_end_button)).perform(click());
     }
 
@@ -323,6 +321,43 @@ public class LoginActivityTest {
         sleep(5000);
         onView(withId(R.id.reject_call_button)).check(matches(isDisplayed()));
         onView(withId(R.id.reject_call_button)).perform(click());
+        sleep(5000);
+    }
+
+    @Test
+    public void testSpeakerCallClick() throws InterruptedException {
+        loginMethod();
+        onView(withId(R.id.callee_edit_text)).check(matches(isDisplayed()));
+        onView(withId(R.id.callee_edit_text)).perform(typeText(USER_NAME));
+        Espresso.closeSoftKeyboard();
+        onView(withId(R.id.start_call_button)).perform(click());
+        sleep(5000);
+        onView(withId(R.id.accept_call_button)).check(matches(isDisplayed()));
+        onView(withId(R.id.accept_call_button)).perform(click());
+        sleep(5000);
+        onView(withId(R.id.localVideoView)).perform(swipeUp());
+        sleep(5000);
+        onView(withId(R.id.speaker_button)).check(matches(isDisplayed()));
+        onView(withId(R.id.speaker_button)).perform(click());
+        sleep(5000);
+    }
+
+    @Test
+    public void testHoldButtonClick() throws InterruptedException {
+        loginMethod();
+        isLoginSucceed = true;
+        onView(withId(R.id.callee_edit_text)).check(matches(isDisplayed()));
+        onView(withId(R.id.callee_edit_text)).perform(typeText(USER_NAME));
+        Espresso.closeSoftKeyboard();
+        onView(withId(R.id.start_call_button)).perform(click());
+        sleep(5000);
+        onView(withId(R.id.accept_call_button)).check(matches(isDisplayed()));
+        onView(withId(R.id.accept_call_button)).perform(click());
+        sleep(5000);
+        onView(withId(R.id.localVideoView)).perform(swipeUp());
+        sleep(5000);
+        onView(withId(R.id.hold_button)).check(matches(isDisplayed()));
+        onView(withId(R.id.hold_button)).perform(click());
         sleep(5000);
     }
 
