@@ -241,6 +241,7 @@ public class ExampleInstrumentedTest {
     public void testIsCallingSucceeded() throws InterruptedException {
         loginMethod();
         onView(withId(R.id.login_button)).perform(click());
+        sleep(2000);
         isLoginSucceed = true;
         onView(withId(R.id.callee_edit_text)).check(matches(isDisplayed()));
         onView(withId(R.id.callee_edit_text)).perform(typeText(USER_NAME));
@@ -284,6 +285,7 @@ public class ExampleInstrumentedTest {
     public void testAcceptingIncomingCallSuccess() throws InterruptedException {
         loginMethod();
         onView(withId(R.id.login_button)).perform(click());
+        sleep(2000);
         isLoginSucceed = true;
         onView(withId(R.id.callee_edit_text)).check(matches(isDisplayed()));
         onView(withId(R.id.callee_edit_text)).perform(typeText(USER_NAME));
@@ -335,7 +337,7 @@ public class ExampleInstrumentedTest {
         loginMethod();
         onView(withId(R.id.login_button)).perform(click());
         isLoginSucceed = true;
-        onView(withId(R.id.callee_edit_text)).check(matches(isDisplayed()));
+        sleep(2000);
         onView(withId(R.id.callee_edit_text)).perform(typeText(USER_NAME));
         closeSoftKeyboard();
         onView(withId(R.id.start_call_button)).perform(click());
@@ -354,6 +356,7 @@ public class ExampleInstrumentedTest {
     public void testIsVideoStartStopButtonWorking() throws InterruptedException {
         loginMethod();
         onView(withId(R.id.login_button)).perform(click());
+        sleep(2000);
         isLoginSucceed = true;
         onView(withId(R.id.callee_edit_text)).check(matches(isDisplayed()));
         onView(withId(R.id.callee_edit_text)).perform(typeText(USER_NAME));
